@@ -2,6 +2,7 @@ import Link from "next/link";
 import { deleteCard } from "@/app/actions/cards";
 import { CardNotFound } from "@/app/cards/[id]/card-not-found";
 import { DeleteButton } from "@/app/cards/[id]/delete-button";
+import { StarButton } from "@/app/cards/star-button";
 import { getCard } from "@/lib/data";
 
 export const metadata = { title: "Word · K-Study" };
@@ -31,9 +32,12 @@ export default async function CardPage({ params }: PageProps<"/cards/[id]">) {
           Lesson {lesson.number} · {lesson.topic_korean}
           {lesson.topic_english && ` (${lesson.topic_english})`}
         </p>
-        <h1 lang="ko" className="mt-2 text-5xl font-bold text-navy">
-          {card.korean}
-        </h1>
+        <div className="mt-2 flex items-start justify-between gap-4">
+          <h1 lang="ko" className="text-5xl font-bold text-navy">
+            {card.korean}
+          </h1>
+          <StarButton cardId={card.id} starred={card.starred} size="lg" />
+        </div>
         <p className="mt-3 text-2xl text-gray-800">{card.english}</p>
 
         {details.length > 0 && (
