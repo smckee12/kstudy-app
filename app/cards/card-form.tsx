@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import type { CardState, CardValues, RequiredField } from "@/app/actions/cards";
+import type { CardState } from "@/app/actions/cards";
+import type { CardValues, RequiredField } from "@/lib/card-rules";
 import type { Lesson } from "@/lib/types";
 
 type Props = {
