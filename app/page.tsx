@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLessons } from "@/lib/data";
 import { getCurrentUser } from "@/lib/supabase/server";
@@ -16,7 +17,12 @@ export default async function Home() {
         You&apos;re logged in as <strong>{user.email}</strong>.
       </p>
 
-      <h2 className="mt-10 text-xl font-bold text-navy">Your lessons</h2>
+      <div className="mt-10 flex items-center justify-between gap-4">
+        <h2 className="text-xl font-bold text-navy">Your lessons</h2>
+        <Link href="/cards" className="text-sm font-semibold text-navy underline">
+          See all my words
+        </Link>
+      </div>
 
       {lessons.length === 0 ? (
         <p className="mt-4 rounded-xl bg-surface p-6 text-gray-600">

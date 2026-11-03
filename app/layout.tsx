@@ -27,14 +27,19 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               K-Study <span className="font-normal opacity-80">한국어</span>
             </Link>
             {user && (
-              <form action={logOut}>
-                <button
-                  type="submit"
-                  className="rounded-lg border border-white/40 px-3 py-1 text-sm hover:bg-white/10"
-                >
-                  Log out
-                </button>
-              </form>
+              <div className="flex items-center gap-4">
+                <Link href="/cards" className="text-sm font-semibold hover:underline">
+                  My words
+                </Link>
+                <form action={logOut}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-white/40 px-3 py-1 text-sm hover:bg-white/10"
+                  >
+                    Log out
+                  </button>
+                </form>
+              </div>
             )}
           </nav>
         </header>
