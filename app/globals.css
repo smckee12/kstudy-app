@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* Colors from PLAN.md section 6 */
+@theme inline {
+  --color-navy: #1f3a5f;
+  --color-accent: #c8102e;
+  --color-success: #2e8b57;
+  --color-surface: #f5f6f8;
+  --font-sans: var(--font-noto-sans-kr);
+}
+
+body {
+  background: #ffffff;
+  color: #1a1a1a;
+}
