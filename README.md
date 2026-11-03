@@ -1,0 +1,43 @@
+# K-Study 한국어
+
+A Korean vocab study app built from my textbook's word list. I can save words by lesson, study them as flashcards, and track how well I know each lesson over time.
+
+**Live app:** https://kstudy-cal-app.vercel.app
+
+## What it does
+
+- Sign up, log in and log out. Each user only sees their own words.
+- *Coming next:* lessons and vocab cards, search and stars, study mode, a dashboard, and lesson mastery. See [PLAN.md](PLAN.md) for the full plan.
+
+## Tools
+
+| Tool | Used for |
+| -------- | -------- |
+| [Claude Code](https://claude.com/claude-code) | AI coding agent that builds each feature |
+| [Next.js](https://nextjs.org) | The web app |
+| [Supabase](https://supabase.com) | Database (Postgres) and sign-up / log-in |
+| [Vercel](https://vercel.com) | Hosting; redeploys on every merge to `main` |
+| GitHub | Code, Issues and pull requests |
+
+## Run it locally
+
+You'll need [Node.js](https://nodejs.org) and a free Supabase project.
+
+1. Clone the repo and install packages:
+   ```bash
+   git clone https://github.com/smckee12/kstudy-app.git
+   cd kstudy-app
+   npm install
+   ```
+2. In Supabase → **SQL Editor**, run each file in [`supabase/migrations`](supabase/migrations) in order.
+3. Copy `.env.example` to `.env.local` and fill in your Supabase project URL and publishable key (Supabase → **Project Settings**).
+4. Start the app:
+   ```bash
+   npm run dev
+   ```
+   Then open http://localhost:3000.
+
+## Project docs
+
+- [PLAN.md](PLAN.md): the plan, written before building
+- [prompts/](prompts): the prompts I gave the agent for each feature
