@@ -15,7 +15,15 @@ export type CardValues = {
   notes: string;
 };
 
-export type CardState = { error?: string; values?: CardValues };
+// The fields a card can't be saved without.
+export type RequiredField = "lesson_id" | "korean" | "english";
+
+export type CardState = {
+  error?: string;
+  // One friendly message per blank required field, shown next to that field.
+  fieldErrors?: Partial<Record<RequiredField, string>>;
+  values?: CardValues;
+};
 
 function readForm(formData: FormData): CardValues {
   const field = (name: string) => String(formData.get(name) ?? "").trim();
@@ -43,20 +51,24 @@ function toRow(values: CardValues) {
   };
 }
 
-// A basic check so a blank form doesn't crash. Feature 4 adds a friendly
-// message for each field.
-function missingRequired(values: CardValues) {
-  return !values.korean || !values.english || !values.lesson_id;
+// Checks the required fields. Returns a message for each one that's blank,
+// or null if the card is ready to save. Spaces alone count as blank,
+// because readForm already trimmed them.
+function validate(values: CardValues): CardState["fieldErrors"] | null {
+  const errors: CardState["fieldErrors"] = {};
+  if (!/^\d+$/.test(values.lesson_id)) errors.lesson_id = "Please choose a lesson.";
+  if (!values.korean) errors.korean = "Please add the Korean word.";
+  if (!values.english) errors.english = "Please add the English meaning.";
+  return Object.keys(errors).length > 0 ? errors : null;
 }
-
-const REQUIRED_MESSAGE = "Korean, English and Lesson are required.";
 
 export async function createCard(
   _prev: CardState,
   formData: FormData,
 ): Promise<CardState> {
   const values = readForm(formData);
-  if (missingRequired(values)) return { error: REQUIRED_MESSAGE, values };
+  const fieldErrors = validate(values);
+  if (fieldErrors) return { fieldErrors, values };
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -78,7 +90,8 @@ export async function updateCard(
   formData: FormData,
 ): Promise<CardState> {
   const values = readForm(formData);
-  if (missingRequired(values)) return { error: REQUIRED_MESSAGE, values };
+  const fieldErrors = validate(values);
+  if (fieldErrors) return { fieldErrors, values };
 
   const supabase = await createClient();
   const { data, error } = await supabase

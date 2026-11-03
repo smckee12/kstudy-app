@@ -9,7 +9,8 @@ A Korean vocab study app built from my textbook's word list. I can save words by
 - Sign up, log in and log out. Each user only sees their own words.
 - Words are grouped into my textbook's lessons, and the home page shows how many words each lesson has.
 - Add a word (Korean, English and lesson, plus optional pronunciation, polite form, example sentence and notes), see all my words, open, edit, or delete a word (after an "Are you sure?" check).
-- *Coming next:* friendly form messages, CSV import, search and stars, study mode, a dashboard, and lesson mastery. See [PLAN.md](PLAN.md) for the full plan.
+- Friendly messages like "Please add the Korean word" if Korean, English or Lesson is left blank, so a half-finished card is never saved.
+- *Coming next:* CSV import, search and stars, study mode, a dashboard, and lesson mastery. See [PLAN.md](PLAN.md) for the full plan.
 
 ## Tools
 

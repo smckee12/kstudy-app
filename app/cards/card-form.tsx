@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import type { CardState, CardValues } from "@/app/actions/cards";
+import type { CardState, CardValues, RequiredField } from "@/app/actions/cards";
 import type { Lesson } from "@/lib/types";
 
 type Props = {
@@ -14,14 +14,19 @@ type Props = {
   cancelHref: string;
 };
 
-const inputClass =
-  "rounded-lg border border-gray-300 bg-white px-3 py-2 text-base font-normal";
+// A red border on a field that needs fixing, gray otherwise.
+function inputClass(error?: string) {
+  return `rounded-lg border bg-white px-3 py-2 text-base font-normal ${
+    error ? "border-accent" : "border-gray-300"
+  }`;
+}
 
 // The shared form for adding and editing a word.
 export function CardForm({ action, lessons, initial, submitLabel, cancelHref }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
   // After a failed save, show what was typed instead of the starting values.
   const values = state.values ?? initial ?? {};
+  const errors = state.fieldErrors ?? {};
 
   return (
     <form action={formAction} className="mt-6 flex flex-col gap-4" noValidate>
@@ -31,7 +36,9 @@ export function CardForm({ action, lessons, initial, submitLabel, cancelHref }: 
           name="lesson_id"
           defaultValue={values.lesson_id ?? ""}
           key={values.lesson_id}
-          className={inputClass}
+          aria-invalid={Boolean(errors.lesson_id)}
+          aria-describedby={errors.lesson_id ? "lesson_id-error" : undefined}
+          className={inputClass(errors.lesson_id)}
         >
           <option value="">Choose a lesson…</option>
           {lessons.map((lesson) => (
@@ -41,11 +48,25 @@ export function CardForm({ action, lessons, initial, submitLabel, cancelHref }: 
             </option>
           ))}
         </select>
+        <FieldError name="lesson_id" error={errors.lesson_id} />
       </label>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field name="korean" label="Korean" value={values.korean} lang="ko" placeholder="먹다" />
-        <Field name="english" label="English" value={values.english} placeholder="to eat" />
+        <Field
+          name="korean"
+          label="Korean"
+          value={values.korean}
+          error={errors.korean}
+          lang="ko"
+          placeholder="먹다"
+        />
+        <Field
+          name="english"
+          label="English"
+          value={values.english}
+          error={errors.english}
+          placeholder="to eat"
+        />
         <Field
           name="pronunciation"
           label="Pronunciation"
@@ -104,19 +125,22 @@ type FieldProps = {
   name: keyof CardValues;
   label: string;
   value?: string;
+  error?: string;
   optional?: boolean;
   multiline?: boolean;
   lang?: string;
   placeholder?: string;
 };
 
-function Field({ name, label, value, optional, multiline, lang, placeholder }: FieldProps) {
+function Field({ name, label, value, error, optional, multiline, lang, placeholder }: FieldProps) {
   const props = {
     name,
     lang,
     placeholder,
     defaultValue: value ?? "",
-    className: inputClass,
+    "aria-invalid": Boolean(error),
+    "aria-describedby": error ? `${name}-error` : undefined,
+    className: inputClass(error),
   };
   return (
     <label className="flex flex-col gap-1 text-sm font-medium">
@@ -125,6 +149,17 @@ function Field({ name, label, value, optional, multiline, lang, placeholder }: F
         {optional && <span className="ml-1 font-normal text-gray-500">(optional)</span>}
       </span>
       {multiline ? <textarea rows={2} {...props} /> : <input type="text" {...props} />}
+      <FieldError name={name as RequiredField} error={error} />
     </label>
+  );
+}
+
+// The friendly message under a field, e.g. "Please add the Korean word."
+function FieldError({ name, error }: { name: RequiredField; error?: string }) {
+  if (!error) return null;
+  return (
+    <span id={`${name}-error`} role="alert" className="text-sm font-normal text-accent">
+      {error}
+    </span>
   );
 }
