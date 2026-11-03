@@ -22,22 +22,25 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${notoSansKr.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <header className="bg-navy text-white">
-          <nav className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-3">
-            <Link href="/" className="text-lg font-bold">
-              K-Study <span className="font-normal opacity-80">한국어</span>
+          <nav className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
+            <Link href="/" className="whitespace-nowrap text-lg font-bold">
+              K-Study <span className="hidden font-normal opacity-80 sm:inline">한국어</span>
             </Link>
             {user && (
-              <div className="flex items-center gap-4">
-                <Link href="/cards" className="text-sm font-semibold hover:underline">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Link href="/study" className="whitespace-nowrap text-sm font-semibold hover:underline">
+                  Study
+                </Link>
+                <Link href="/cards" className="whitespace-nowrap text-sm font-semibold hover:underline">
                   My words
                 </Link>
-                <Link href="/starred" className="text-sm font-semibold hover:underline">
+                <Link href="/starred" className="whitespace-nowrap text-sm font-semibold hover:underline">
                   Starred
                 </Link>
                 <form action={logOut}>
                   <button
                     type="submit"
-                    className="rounded-lg border border-white/40 px-3 py-1 text-sm hover:bg-white/10"
+                    className="whitespace-nowrap rounded-lg border border-white/40 px-3 py-1 text-sm hover:bg-white/10"
                   >
                     Log out
                   </button>

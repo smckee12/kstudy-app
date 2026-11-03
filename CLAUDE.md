@@ -39,8 +39,8 @@ After merging: `gh pr merge N --merge`, `git switch main && git pull --ff-only`,
 - `lib/data.ts`: all reads. `getLessons()`, `getCards({ search, lessonId, starredOnly, sort })`, `getCard(id)`. The My words filters live in the URL and are parsed by `lib/card-filters.ts`. Cards come back as `CardWithLesson` (the card, its `lesson`, and `starred`). Add new filters/sorting here.
 - `lib/card-rules.ts`: the card rules shared by the forms and the CSV import (`validateCard`, `toCardRow`, the friendly messages like "Please add the Korean word.").
 - `lib/csv-import.ts`: reads a vocab CSV with Papa Parse. It runs in the browser for the preview and again in the Server Action before saving.
-- `app/actions/`: Server Actions (`auth.ts`, `cards.ts`, `import.ts`, `stars.ts`). They return `{ error }` or field errors instead of throwing.
-- Pages: `/cards` (My words), `/cards/new`, `/cards/[id]`, `/cards/[id]/edit`, `/cards/import`, `/starred`. A missing or someone else's card shows "Card not found" (`app/cards/[id]/card-not-found.tsx`).
+- `app/actions/`: Server Actions (`auth.ts`, `cards.ts`, `import.ts`, `stars.ts`, `reviews.ts`). They return `{ error }` or field errors instead of throwing.
+- Pages: `/cards` (My words), `/cards/new`, `/cards/[id]`, `/cards/[id]/edit`, `/cards/import`, `/starred`, `/study` (pick a deck), `/study/[deck]` (a lesson id or `starred`; the flip-card session is `app/study/[deck]/study-session.tsx`). A missing or someone else's card shows "Card not found" (`app/cards/[id]/card-not-found.tsx`).
 - Shared UI: `app/cards/card-list.tsx` (the word list used by My words and Starred), `app/cards/card-form.tsx` (add/edit form), `app/cards/star-button.tsx` (☆/★, optimistic).
 - `samples/vocab-sample.csv`: a small test file for the importer.
 
@@ -49,7 +49,7 @@ After merging: `gh pr merge N --merge`, `git switch main && git pull --ff-only`,
 - Every schema change is a new numbered file in `supabase/migrations/` (next one is after the highest existing number). Never edit a migration that has already been run.
 - **I run the SQL myself** in Supabase → SQL Editor, as a new query. Give me the file and wait for me to confirm it ran **before** merging, or the live site breaks.
 - Every table with user data has a `user_id uuid default auth.uid()` column and row-level security so users only see their own rows.
-- Check whether a table exists with the publishable key from `.env.local`: `curl "$URL/rest/v1/<table>?select=id&limit=1" -H "apikey: $KEY"` (200 = exists, 404 = not yet). Next migration is `004_...`. The `reviews` table (PLAN.md section 3) is needed for feature 8.
+- Check whether a table exists with the publishable key from `.env.local`: `curl "$URL/rest/v1/<table>?select=id&limit=1" -H "apikey: $KEY"` (200 = exists, 404 = not yet). Next migration is `005_...`. `reviews` (004) exists: one row per study answer, insert-only. Features 9–11 calculate everything from it. Test reviews must use a test word (they can only be removed by deleting the card).
 - A migration that the new code depends on must run **before** merging. Write it first and give it to me, then build while I run it.
 
 ## Testing in the browser
