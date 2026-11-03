@@ -21,13 +21,20 @@ export function CardFiltersBar({ filters, lessons }: Props) {
   const [isPending, startTransition] = useTransition();
   const [search, setSearch] = useState(filters.search);
   const [sentSearch, setSentSearch] = useState(filters.search);
+  const [urlSearch, setUrlSearch] = useState(filters.search);
   const typingTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // If the URL's search changed by something other than typing here (the
-  // Back button, or "Clear the search and filters"), show it in the box.
-  if (filters.search !== sentSearch) {
-    setSentSearch(filters.search);
-    setSearch(filters.search);
+  // The box is the boss while I'm typing. It only copies the URL's search
+  // when the URL changed by something else (the Back button, or "Clear the
+  // search and filters"). It ignores the URL while my own search is still
+  // loading: the page shows the old search until the new results arrive,
+  // and copying that would wipe out what I just typed.
+  if (filters.search !== urlSearch) {
+    setUrlSearch(filters.search);
+    if (!isPending && filters.search !== sentSearch) {
+      setSentSearch(filters.search);
+      setSearch(filters.search);
+    }
   }
 
   useEffect(() => () => clearTimeout(typingTimer.current), []);
