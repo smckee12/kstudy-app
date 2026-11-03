@@ -31,6 +31,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 <Link href="/cards" className="text-sm font-semibold hover:underline">
                   My words
                 </Link>
+                <Link href="/starred" className="text-sm font-semibold hover:underline">
+                  Starred
+                </Link>
                 <form action={logOut}>
                   <button
                     type="submit"

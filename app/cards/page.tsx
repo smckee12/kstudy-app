@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CardList } from "@/app/cards/card-list";
 import { getCards } from "@/lib/data";
 
 export const metadata = { title: "My words · K-Study" };
@@ -43,26 +44,7 @@ export default async function CardsPage() {
           .
         </p>
       ) : (
-        <ul className="mt-6 flex flex-col gap-2">
-          {cards.map((card) => (
-            <li key={card.id}>
-              <Link
-                href={`/cards/${card.id}`}
-                className="flex items-center justify-between gap-4 rounded-xl bg-surface px-5 py-4 hover:bg-gray-200/60"
-              >
-                <span>
-                  <span lang="ko" className="text-xl font-bold text-navy">
-                    {card.korean}
-                  </span>
-                  <span className="ml-3 text-gray-700">{card.english}</span>
-                </span>
-                <span className="shrink-0 text-sm text-gray-500">
-                  Lesson {card.lesson.number}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <CardList cards={cards} />
       )}
     </main>
   );
