@@ -36,7 +36,7 @@ After merging: `gh pr merge N --merge`, `git switch main && git pull --ff-only`,
 
 ## How the code is organized
 
-- `lib/data.ts`: all reads. `getLessons()`, `getCards({ starredOnly })`, `getCard(id)`. Cards come back as `CardWithLesson` (the card, its `lesson`, and `starred`). Add new filters/sorting here.
+- `lib/data.ts`: all reads. `getLessons()`, `getCards({ search, lessonId, starredOnly, sort })`, `getCard(id)`. The My words filters live in the URL and are parsed by `lib/card-filters.ts`. Cards come back as `CardWithLesson` (the card, its `lesson`, and `starred`). Add new filters/sorting here.
 - `lib/card-rules.ts`: the card rules shared by the forms and the CSV import (`validateCard`, `toCardRow`, the friendly messages like "Please add the Korean word.").
 - `lib/csv-import.ts`: reads a vocab CSV with Papa Parse. It runs in the browser for the preview and again in the Server Action before saving.
 - `app/actions/`: Server Actions (`auth.ts`, `cards.ts`, `import.ts`, `stars.ts`). They return `{ error }` or field errors instead of throwing.
