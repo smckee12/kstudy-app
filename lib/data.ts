@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
+import type { CardFilters } from "@/lib/card-filters";
 import type { Card, Lesson } from "@/lib/types";
 
 export type LessonWithCount = Lesson & { card_count: number };
@@ -40,19 +41,46 @@ const withStarred = ({ stars, ...card }: CardRow): CardWithLesson => ({
   starred: stars.length > 0,
 });
 
-// The logged-in user's cards, newest first. With `starredOnly`, just the
-// starred ones: "stars!inner" keeps only cards that have a matching star.
-export async function getCards({ starredOnly = false } = {}): Promise<CardWithLesson[]> {
+// Builds the "Korean or English contains ___" filter. The search text is
+// escaped twice so that symbols in it are matched as plain text:
+//   1. % _ \ would otherwise be wildcards in an ilike pattern.
+//   2. The value goes in "double quotes" so commas and brackets, as in
+//      "counter (for items)", don't break Supabase's or=(...) syntax.
+function koreanOrEnglishContains(search: string) {
+  const pattern = `%${search.replace(/[\\%_]/g, "\\$&")}%`;
+  const quoted = `"${pattern.replace(/[\\"]/g, "\\$&")}"`;
+  return `korean.ilike.${quoted},english.ilike.${quoted}`;
+}
+
+// The logged-in user's cards, filtered and sorted (newest first by default).
+// With `starredOnly`, just the starred ones: "stars!inner" keeps only cards
+// that have a matching star.
+export async function getCards(filters: Partial<CardFilters> = {}): Promise<CardWithLesson[]> {
+  const { search = "", lessonId = null, starredOnly = false, sort = "newest" } = filters;
   const user = await getCurrentUser();
   if (!user) return [];
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("cards")
     .select(`${CARD_COLUMNS}, stars${starredOnly ? "!inner" : ""}(card_id)`)
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .eq("user_id", user.id);
 
+  if (search) query = query.or(koreanOrEnglishContains(search));
+  if (lessonId !== null) query = query.eq("lesson_id", lessonId);
+
+  // Hangul is stored in 가나다 order in Unicode, so sorting the Korean
+  // column alphabetically gives dictionary order. "By lesson" sorts by the
+  // lesson's number, then 가나다 inside each lesson.
+  if (sort === "korean") {
+    query = query.order("korean");
+  } else if (sort === "lesson") {
+    query = query.order("lesson(number)").order("korean");
+  } else {
+    query = query.order("created_at", { ascending: false });
+  }
+
+  const { data, error } = await query.order("id");
   if (error) throw new Error(`Couldn't load cards: ${error.message}`);
   return (data as CardRow[]).map(withStarred);
 }

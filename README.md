@@ -12,7 +12,8 @@ A Korean vocab study app built from my textbook's word list. I can save words by
 - Friendly messages like "Please add the Korean word" if Korean, English or Lesson is left blank, so a half-finished card is never saved.
 - Import my vocab spreadsheet as a CSV: a preview shows how many words go into each lesson and which rows have problems, and words that are already saved are skipped. Try it with [`samples/vocab-sample.csv`](samples/vocab-sample.csv).
 - Star words I keep forgetting (☆ → ★) and see them all on the Starred page.
-- *Coming next:* search, study mode, a dashboard, and lesson mastery. See [PLAN.md](PLAN.md) for the full plan.
+- Search my words in Korean or English, filter by lesson or starred, and sort by newest, 가나다 order, or lesson. The search is saved in the page's address, so it survives a reload.
+- *Coming next:* study mode, a dashboard, and lesson mastery. See [PLAN.md](PLAN.md) for the full plan.
 
 ## Tools
 
