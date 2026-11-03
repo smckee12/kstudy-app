@@ -20,3 +20,17 @@ Agent: Claude Code · Issue #13 · Branch `feature/validation`
 ## Why check on the server
 
 The browser could skip a check that only runs in the page, so the real check happens in the Server Action. The database also refuses a blank Korean or English word (the `check` rules from feature 2), so there are three layers.
+
+## How it was tested
+
+Locally in the browser (`npm run dev`), logged in with my account:
+
+- Saved a completely empty add form → all three messages, each under its field with a red border.
+- Chose Lesson 2, typed 선생님, and typed only spaces for English → only "Please add the English meaning."; the lesson and Korean were kept.
+- Typed "teacher" and saved → the word was saved and its page opened.
+- On the edit form, cleared the Korean and saved → "Please add the Korean word."; the card was not changed.
+- Deleted the test word afterwards. No server errors.
+
+## Prompt 2
+
+> Logged in, test it
