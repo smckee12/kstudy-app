@@ -25,3 +25,19 @@ Agent: Claude Code · Issue #11 · Branch `feature/cards`
 
 - Leaving Korean, English or Lesson blank shows one general message ("Korean, English and Lesson are required.") for now. Feature 4 replaces it with a friendly message for each field.
 - The "Are you sure?" prompt appears on the page instead of as a browser pop-up, so it matches the app's look.
+
+## How it was tested
+
+Locally in the browser (`npm run dev`), logged in with my account:
+
+- Saved with only Korean filled in: the form showed "Korean, English and Lesson are required." and kept the Korean I typed.
+- Added 학생 = student in Lesson 1 with a pronunciation: it opened the word's page.
+- Edited the pronunciation to [학쌩] and added a note: the page showed the changes.
+- The list showed "1 word". `/cards/99999` and `/cards/abc/edit` showed "Card not found".
+- Delete → Cancel kept the word. Delete → "Yes, delete" removed it and went back to an empty list.
+
+## Prompt 2
+
+> (From my main session) I stopped the old dev server on port 3000. Start your own and test.
+
+The first dev server was started in another chat and kept running old code, so the new pages crashed until it was restarted. It wasn't a bug in the feature.
