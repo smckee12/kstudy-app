@@ -40,3 +40,14 @@ Locally in the browser, logged in, with my 260 words:
 
 - The Starred page from feature 6 stays as it is; My words also has a "Starred only" checkbox so it can be combined with search and lesson.
 - No database changes were needed.
+
+## Prompt 2 (after merging)
+
+> It works, but there is input lag when typing into the search bar
+
+## Bug caught: the search box lost what I typed
+
+- **What happened:** while a search was loading, the box jumped back to the previous search for a moment, and letters typed during that moment could be lost. Recorded in the browser: typing "sch", pausing, then "ool" showed "sch" → "" → "ool" → "sch" → "ool", and the box ended at **"ool"** instead of "school". On localhost it was quick; on the live site the database is further away, so it felt like lag.
+- **Why:** the page keeps showing the old results until the new ones arrive. The box's "copy the search from the URL if it changed somewhere else" check (added for the Clear link) compared the URL with what I'd just sent, saw they didn't match yet, and put the old text back.
+- **Fix** (`app/cards/card-filters.tsx`, issue #22, branch `fix/search-box`): the box only copies the URL when the URL actually changes, and never while my own search is still loading.
+- **Tested:** the same typing now records just "sch" → "school", and the list shows the 4 "school" words. The Clear link and the Back button still update the box. No server errors.
