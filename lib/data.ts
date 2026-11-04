@@ -111,20 +111,23 @@ export type DashboardData = {
   // was right), for "this week" and the chart. The browser sorts them into
   // days in my own time zone.
   recent: ReviewTime[];
+  // When I answered, to the minute, for the study streak. Any number of
+  // answers in the same minute is one entry, which keeps this list short.
+  answerMinutes: string[];
 };
 
 // Everything the dashboard needs. Nothing is stored for it: it's all
 // counted from cards and reviews each time (PLAN.md section 3).
 export async function getDashboardData(): Promise<DashboardData> {
   const user = await getCurrentUser();
-  if (!user) return { wordCount: 0, reviewCount: 0, correctCount: 0, recent: [] };
+  if (!user) return { wordCount: 0, reviewCount: 0, correctCount: 0, recent: [], answerMinutes: [] };
 
   const supabase = await createClient();
   // 15 days, not 14: one spare day covers the gap between UTC and my time zone.
   const since = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
 
   // `head: true` asks the database for just the count, not the rows.
-  const [words, reviews, correct, recent] = await Promise.all([
+  const [words, reviews, correct, recent, answerTimes] = await Promise.all([
     supabase.from("cards").select("id", { count: "exact", head: true }).eq("user_id", user.id),
     supabase.from("reviews").select("id", { count: "exact", head: true }).eq("user_id", user.id),
     supabase
@@ -141,6 +144,16 @@ export async function getDashboardData(): Promise<DashboardData> {
       // Supabase returns at most 1,000 rows per request: that is over 70
       // answers a day for two weeks, plenty for one student.
       .limit(1000),
+    // A streak can go back any number of days, so this needs every answer.
+    fetchAllRows<{ reviewed_at: string }>((from, to) =>
+      supabase
+        .from("reviews")
+        .select("reviewed_at")
+        .eq("user_id", user.id)
+        .order("reviewed_at")
+        .order("id")
+        .range(from, to),
+    ),
   ]);
 
   const error = words.error ?? reviews.error ?? correct.error ?? recent.error;
@@ -151,6 +164,9 @@ export async function getDashboardData(): Promise<DashboardData> {
     reviewCount: reviews.count ?? 0,
     correctCount: correct.count ?? 0,
     recent: recent.data ?? [],
+    answerMinutes: [
+      ...new Set(answerTimes.map((r) => `${new Date(r.reviewed_at).toISOString().slice(0, 16)}Z`)),
+    ],
   };
 }
 

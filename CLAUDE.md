@@ -10,7 +10,7 @@ Live app: https://kstudy-cal-app.vercel.app · Repo: https://github.com/smckee12
 
 Check, don't assume: `gh pr list --state all` shows which features are merged, and `gh issue list` shows open work. Build the next unmerged feature from PLAN.md section 2, in order.
 
-Snapshot (Nov 3 2026): features 1–6 are merged and live (sign up/log in, data model, card CRUD, validation, CSV import, stars). **Next is feature 7: Find things** (search, filter by lesson or starred, sort). Migrations 001–003 have been run.
+Snapshot (Nov 4 2026): all 11 features in PLAN.md section 2 are built. What's left is the "Plan vs. Reality" table in PLAN.md. Migrations 001–004 have been run.
 
 My real word bank is in the live database: 5 lessons and the 260 words I imported from my spreadsheet. Local `npm run dev` uses the **same** Supabase project as the live site.
 
@@ -41,6 +41,7 @@ After merging: `gh pr merge N --merge`, `git switch main && git pull --ff-only`,
 - `lib/dashboard.ts`: the dashboard math (`percentCorrect`, `reviewsPerDay` in my time zone). Tested in `lib/dashboard.test.ts`; run `npm test`. `getDashboardData()` in `lib/data.ts` loads the counts.
 - `lib/mastery.ts`: the lesson mastery math (`wordProgress` replays a word's answers to get its status, `lessonMastery` gives a lesson's counts and its weakest and fading word lists). Tested in `lib/mastery.test.ts`. `getLessonMastery()` in `lib/data.ts` loads all cards and reviews, asking for 1,000 rows at a time (Supabase's limit per request); `app/lesson-progress.tsx` shows it on the home page tiles.
 - `lib/random-set.ts`: the random mix (`parseCount`, and `pickLeastRecent`, which picks never-answered cards first, then the longest since answered). Tested in `lib/random-set.test.ts`. `getLastAnswered()` in `lib/data.ts` loads when each card was last answered.
+- `lib/streak.ts`: the study streak math (`studyStreak`, in my time zone). Tested in `lib/streak.test.ts`. `getDashboardData()` sends the times of my answers, to the minute, as `answerMinutes`; the browser works out the streak in `app/dashboard.tsx`.
 - `lib/csv-import.ts`: reads a vocab CSV with Papa Parse. It runs in the browser for the preview and again in the Server Action before saving.
 - `app/actions/`: Server Actions (`auth.ts`, `cards.ts`, `import.ts`, `stars.ts`, `reviews.ts`). They return `{ error }` or field errors instead of throwing.
 - Pages: `/cards` (My words), `/cards/new`, `/cards/[id]`, `/cards/[id]/edit`, `/cards/import`, `/starred`, `/study` (pick a deck), `/study/[deck]` (a lesson id, `starred`, or `random?count=N` with 1–50 cards, checked in `lib/random-set.ts`; the flip-card session is `app/study/[deck]/study-session.tsx`). A missing or someone else's card shows "Card not found" (`app/cards/[id]/card-not-found.tsx`).
