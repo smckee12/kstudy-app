@@ -45,3 +45,12 @@ Agent: Claude Code · Issue #26 · Branch `feature/dashboard`
 - The dashboard is on the home page instead of its own page.
 - "This week" means the last 7 days (including today), not "since Monday", so it doesn't reset to 0 every Monday morning.
 - Added an "all time" reviews tile and a table view of the chart.
+
+## Prompt 2 (after the merge)
+
+> Yeah that looks good. Can we adjust the dates on the x axis of the reviews per day table? Maybe we only display dates for every 7 days? Since we're looking back two weeks
+
+## What the agent did
+
+- Changed the chart's x axis to label every 7th day, counting back from today, instead of every 3rd. A 14-day chart now shows two dates: today and 7 days ago. Every bar still shows its date on hover and in "Show as a table".
+- Tested locally in the browser with my real data: the axis shows Oct 28 and Nov 4, the bar is still there, and there are no console errors. No data was changed.
