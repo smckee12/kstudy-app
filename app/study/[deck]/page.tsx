@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { StudySession } from "@/app/study/[deck]/study-session";
-import { getCards, getLessons } from "@/lib/data";
-import { parseCount, RANDOM_SET_MAX } from "@/lib/random-set";
+import { getCards, getLastAnswered, getLessons } from "@/lib/data";
+import { parseCount, pickLeastRecent, RANDOM_SET_MAX } from "@/lib/random-set";
 import { shuffle } from "@/lib/shuffle";
 
 export const metadata = { title: "Study · K-Study" };
@@ -16,10 +16,11 @@ export default async function StudyDeckPage({ params, searchParams }: PageProps<
     if (count === null) {
       return <NothingToStudy message={`Please choose a number of cards from 1 to ${RANDOM_SET_MAX}.`} />;
     }
-    // Shuffle all my cards, then keep the first `count`: a random pick
-    // that's already in a random order. If I ask for more cards than I
-    // have, I just get all of them.
-    const cards = shuffle(await getCards()).slice(0, count);
+    // The cards I've studied least recently, so a new deck isn't full of the
+    // same cards as my last one. If I ask for more cards than I have, I just
+    // get all of them.
+    const [allCards, lastAnswered] = await Promise.all([getCards(), getLastAnswered()]);
+    const cards = pickLeastRecent(allCards, lastAnswered, count, new Date());
     if (cards.length === 0) return <NothingToStudy message="There are no words to study here yet." />;
     return (
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12">
