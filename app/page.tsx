@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Dashboard } from "@/app/dashboard";
-import { getDashboardData, getLessons } from "@/lib/data";
+import { LessonProgress } from "@/app/lesson-progress";
+import { getDashboardData, getLessonMastery, getLessons } from "@/lib/data";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 // Home page. Only logged-in users get here (see proxy.ts).
@@ -9,7 +10,11 @@ export default async function Home() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const [lessons, dashboard] = await Promise.all([getLessons(), getDashboardData()]);
+  const [lessons, dashboard, mastery] = await Promise.all([
+    getLessons(),
+    getDashboardData(),
+    getLessonMastery(),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
@@ -33,7 +38,7 @@ export default async function Home() {
           be grouped by lesson here.
         </p>
       ) : (
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+        <ul className="mt-4 grid items-start gap-3 sm:grid-cols-2">
           {lessons.map((lesson) => (
             <li key={lesson.id} className="rounded-xl bg-surface p-5">
               <p className="text-sm font-semibold text-gray-500">
@@ -55,6 +60,7 @@ export default async function Home() {
                   </Link>
                 )}
               </p>
+              {mastery.has(lesson.id) && <LessonProgress mastery={mastery.get(lesson.id)!} />}
             </li>
           ))}
         </ul>
