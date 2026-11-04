@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getLessons } from "@/lib/data";
+import { Dashboard } from "@/app/dashboard";
+import { getDashboardData, getLessons } from "@/lib/data";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 // Home page. Only logged-in users get here (see proxy.ts).
@@ -8,7 +9,7 @@ export default async function Home() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const lessons = await getLessons();
+  const [lessons, dashboard] = await Promise.all([getLessons(), getDashboardData()]);
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
@@ -16,6 +17,8 @@ export default async function Home() {
       <p className="mt-2 text-gray-700">
         You&apos;re logged in as <strong>{user.email}</strong>.
       </p>
+
+      <Dashboard data={dashboard} />
 
       <div className="mt-10 flex items-center justify-between gap-4">
         <h2 className="text-xl font-bold text-navy">Your lessons</h2>
