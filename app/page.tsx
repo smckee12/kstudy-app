@@ -44,8 +44,13 @@ export default async function Home() {
                   </span>
                 )}
               </p>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 flex items-center justify-between text-sm text-gray-600">
                 {lesson.card_count} {lesson.card_count === 1 ? "word" : "words"}
+                {lesson.card_count > 0 && (
+                  <Link href={`/study/${lesson.id}`} className="font-semibold text-navy underline">
+                    Study →
+                  </Link>
+                )}
               </p>
             </li>
           ))}
