@@ -2,6 +2,7 @@ import "server-only";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import type { CardFilters } from "@/lib/card-filters";
 import type { ReviewTime } from "@/lib/dashboard";
+import { lessonMastery, type Answer, type LessonMastery, type Word } from "@/lib/mastery";
 import type { Card, Lesson } from "@/lib/types";
 
 export type LessonWithCount = Lesson & { card_count: number };
@@ -151,4 +152,68 @@ export async function getDashboardData(): Promise<DashboardData> {
     correctCount: correct.count ?? 0,
     recent: recent.data ?? [],
   };
+}
+
+// Supabase returns at most 1,000 rows per request, and a word's status needs
+// its whole history, so keep asking for the next 1,000 until there are no more.
+const PAGE_SIZE = 1000;
+async function fetchAllRows<T>(
+  fetchPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>,
+): Promise<T[]> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await fetchPage(from, from + PAGE_SIZE - 1);
+    if (error) throw new Error(`Couldn't load lesson mastery: ${error.message}`);
+    rows.push(...(data ?? []));
+    if (!data || data.length < PAGE_SIZE) return rows;
+  }
+}
+
+// Each lesson's mastery, by lesson id. Nothing is stored for it: every word's
+// status is worked out from its answers each time (PLAN.md section 3).
+export async function getLessonMastery(): Promise<Map<number, LessonMastery>> {
+  const user = await getCurrentUser();
+  if (!user) return new Map();
+
+  const supabase = await createClient();
+  const [cards, reviews] = await Promise.all([
+    fetchAllRows<Pick<Word, "id" | "korean" | "english"> & { lesson_id: number }>((from, to) =>
+      supabase
+        .from("cards")
+        .select("id, lesson_id, korean, english")
+        .eq("user_id", user.id)
+        .order("id")
+        .range(from, to),
+    ),
+    // Oldest first: "how many in a row" depends on the order of the answers.
+    fetchAllRows<Answer & { card_id: number }>((from, to) =>
+      supabase
+        .from("reviews")
+        .select("card_id, reviewed_at, correct")
+        .eq("user_id", user.id)
+        .order("reviewed_at")
+        .order("id")
+        .range(from, to),
+    ),
+  ]);
+
+  const answersByCard = new Map<number, Answer[]>();
+  for (const { card_id, ...answer } of reviews) {
+    const answers = answersByCard.get(card_id);
+    if (answers) answers.push(answer);
+    else answersByCard.set(card_id, [answer]);
+  }
+
+  const wordsByLesson = new Map<number, Word[]>();
+  for (const { lesson_id, ...card } of cards) {
+    const word = { ...card, answers: answersByCard.get(card.id) ?? [] };
+    const words = wordsByLesson.get(lesson_id);
+    if (words) words.push(word);
+    else wordsByLesson.set(lesson_id, [word]);
+  }
+
+  const now = new Date();
+  return new Map(
+    [...wordsByLesson].map(([lessonId, words]) => [lessonId, lessonMastery(words, now)]),
+  );
 }
