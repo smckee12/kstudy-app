@@ -93,10 +93,9 @@ export function Dashboard({ data }: { data: DashboardData }) {
                     tickLine={false}
                     axisLine={{ stroke: "#d1d5db" }}
                     tick={{ fontSize: 12, fill: "#6b7280" }}
-                    // Label every 3rd day, counting back from today, so today
-                    // always has a label, the spacing is even, and the
-                    // labels still fit side by side on a phone.
-                    ticks={days.filter((_, i) => (days.length - 1 - i) % 3 === 0).map((d) => d.label)}
+                    // Label every 7th day, counting back from today, so today
+                    // always has a label and the two-week chart stays uncluttered.
+                    ticks={days.filter((_, i) => (days.length - 1 - i) % 7 === 0).map((d) => d.label)}
                     interval={0}
                   />
                   <YAxis
