@@ -143,8 +143,6 @@ erDiagram
 
 ## Plan vs. Reality
 
-*To be filled in when the app is finished.*
-
 | Planned feature | Shipped / Changed / Cut | Status (Done/Backlogged) | Learning | What changed and why (one line) |
 | -------- | -------- | -------- | -------- | -------- |
 | 1. Sign up and log in | Shipped | Done | *(Sean to write)* | Built as planned. Added a check for signing up with an email that already exists, because Supabase hides that case when "Confirm email" is on. |
