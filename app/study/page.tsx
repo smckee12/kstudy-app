@@ -39,7 +39,7 @@ export default async function StudyPage() {
         <Form action="/study/random" className="mt-6 rounded-xl border-2 border-navy/15 p-5">
           <h2 className="font-bold text-navy">Random mix from all lessons</h2>
           <p className="mt-1 text-sm text-gray-600">
-            Cards picked at random from every lesson, in a shuffled order.
+            Cards from every lesson in a shuffled order, starting with the ones you&apos;ve studied least recently.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2">

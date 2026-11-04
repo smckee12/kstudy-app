@@ -163,7 +163,7 @@ async function fetchAllRows<T>(
   const rows: T[] = [];
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await fetchPage(from, from + PAGE_SIZE - 1);
-    if (error) throw new Error(`Couldn't load lesson mastery: ${error.message}`);
+    if (error) throw new Error(`Couldn't load your data: ${error.message}`);
     rows.push(...(data ?? []));
     if (!data || data.length < PAGE_SIZE) return rows;
   }
@@ -216,4 +216,23 @@ export async function getLessonMastery(): Promise<Map<number, LessonMastery>> {
   return new Map(
     [...wordsByLesson].map(([lessonId, words]) => [lessonId, lessonMastery(words, now)]),
   );
+}
+
+// When I last answered each card, by card id. Cards I've never answered aren't
+// in the map. Answers come oldest first, so each card ends on its latest one.
+export async function getLastAnswered(): Promise<Map<number, string>> {
+  const user = await getCurrentUser();
+  if (!user) return new Map();
+
+  const supabase = await createClient();
+  const reviews = await fetchAllRows<{ card_id: number; reviewed_at: string }>((from, to) =>
+    supabase
+      .from("reviews")
+      .select("card_id, reviewed_at")
+      .eq("user_id", user.id)
+      .order("reviewed_at")
+      .order("id")
+      .range(from, to),
+  );
+  return new Map(reviews.map((review) => [review.card_id, review.reviewed_at]));
 }
