@@ -40,7 +40,7 @@ After merging: `gh pr merge N --merge`, `git switch main && git pull --ff-only`,
 - `lib/card-rules.ts`: the card rules shared by the forms and the CSV import (`validateCard`, `toCardRow`, the friendly messages like "Please add the Korean word.").
 - `lib/csv-import.ts`: reads a vocab CSV with Papa Parse. It runs in the browser for the preview and again in the Server Action before saving.
 - `app/actions/`: Server Actions (`auth.ts`, `cards.ts`, `import.ts`, `stars.ts`, `reviews.ts`). They return `{ error }` or field errors instead of throwing.
-- Pages: `/cards` (My words), `/cards/new`, `/cards/[id]`, `/cards/[id]/edit`, `/cards/import`, `/starred`, `/study` (pick a deck), `/study/[deck]` (a lesson id or `starred`; the flip-card session is `app/study/[deck]/study-session.tsx`). A missing or someone else's card shows "Card not found" (`app/cards/[id]/card-not-found.tsx`).
+- Pages: `/cards` (My words), `/cards/new`, `/cards/[id]`, `/cards/[id]/edit`, `/cards/import`, `/starred`, `/study` (pick a deck), `/study/[deck]` (a lesson id, `starred`, or `random?count=N` with 1–50 cards, checked in `lib/random-set.ts`; the flip-card session is `app/study/[deck]/study-session.tsx`). A missing or someone else's card shows "Card not found" (`app/cards/[id]/card-not-found.tsx`).
 - Shared UI: `app/cards/card-list.tsx` (the word list used by My words and Starred), `app/cards/card-form.tsx` (add/edit form), `app/cards/star-button.tsx` (☆/★, optimistic).
 - `samples/vocab-sample.csv`: a small test file for the importer.
 

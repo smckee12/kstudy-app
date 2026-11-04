@@ -11,7 +11,8 @@ type Answer = { card: CardWithLesson; correct: boolean };
 // One study session: a card at a time, Korean on the front, English on
 // the back. Each "Got it" / "Missed it" is saved to the reviews table
 // right away, so leaving halfway still keeps the answers so far.
-export function StudySession({ cards }: { cards: CardWithLesson[] }) {
+// `newSetHref` (random mix only) adds a "New random set" button at the end.
+export function StudySession({ cards, newSetHref }: { cards: CardWithLesson[]; newSetHref?: string }) {
   // Kept in state so the order stays the same for the whole session.
   const [deck, setDeck] = useState(cards);
   const [index, setIndex] = useState(0);
@@ -155,6 +156,15 @@ export function StudySession({ cards }: { cards: CardWithLesson[] }) {
           >
             {cards.length === 1 ? "Study again" : `Study all ${cards.length} again`}
           </button>
+          {newSetHref && (
+            // A full page load (not <Link>), so the server picks new cards.
+            <a
+              href={newSetHref}
+              className="rounded-lg border border-navy px-4 py-2 font-semibold text-navy"
+            >
+              New random set
+            </a>
+          )}
           <Link
             href="/study"
             className="rounded-lg border border-gray-300 px-4 py-2 font-semibold text-gray-700"

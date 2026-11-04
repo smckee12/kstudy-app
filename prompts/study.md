@@ -43,3 +43,29 @@ Locally in the browser, logged in:
 - Added a **Starred** deck next to the lessons, to drill my problem words (the point of feature 6).
 - Added "study just the missed words" at the end of a session.
 - Keyboard shortcuts (Space, ←, →) for studying on a laptop.
+
+## Prompt 2
+
+> I want to add an option to study a randomly selected group of cards from all lessons. I want the user to be able to type in a number of cards they want to study in a numerical field (max 50 cards), then the site should randomly select cards from all lessons, shuffle them, and present them for study
+
+## What the agent did
+
+- Added a **Random mix from all lessons** box at the top of the Study page: a number field (default 20, 1 to 50) and a Start button.
+  - It's a Next.js `<Form>`. Submitting goes to `/study/random?count=20` without reloading the whole page.
+  - The number field's `min`, `max` and `required` make the browser stop anything outside 1–50 before sending it. If I have fewer than 50 words, the maximum is how many words I have.
+- `/study/random?count=N` (in `app/study/[deck]/page.tsx`): the server shuffles **all** my cards and keeps the first N. That one shuffle both picks the cards at random and puts them in a random order. The same study session is used, so answers are saved the same way.
+- The number in the URL is checked again on the server (`lib/random-set.ts`), because anyone can type a URL by hand. Anything that isn't a whole number from 1 to 50 shows "Please choose a number of cards from 1 to 50."
+- At the end of a random mix there's a **New random set** button that loads a fresh set of the same size.
+
+## How it was tested
+
+- Typed 7 and pressed Start → "Random mix · 7 cards", shuffled. Only looked at the cards, didn't answer them, so nothing was added to my real history.
+- Loaded a 50-card set three times: each time it had 50 different cards (no repeats), from all 5 lessons, in a different order.
+- Typing 51 in the box → the browser blocked it ("Value must be less than or equal to 50").
+- Typing the URL by hand with 0, 51, -3, 2.5, abc or nothing → "Please choose a number of cards from 1 to 50."
+- No server errors.
+- **Not tested in the browser:** the "New random set" button at the end, because reaching the end means answering real words. It's a plain link back to the same URL, which picks a fresh set each time (tested above).
+
+## Differences from the plan
+
+- The random mix isn't in PLAN.md. It's an addition I asked for during feature 8.
