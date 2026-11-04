@@ -13,10 +13,12 @@ A Korean vocab study app built from my textbook's word list. I can save words by
 - Import my vocab spreadsheet as a CSV: a preview shows how many words go into each lesson and which rows have problems, and words that are already saved are skipped. Try it with [`samples/vocab-sample.csv`](samples/vocab-sample.csv).
 - Star words I keep forgetting (☆ → ★) and see them all on the Starred page.
 - Search my words in Korean or English, filter by lesson or starred, and sort by newest, 가나다 order, or lesson. The search is saved in the page's address, so it survives a reload.
-- Study mode: study one lesson, my starred words, or a random mix of up to 50 cards from all lessons, in a shuffled order. The mix starts with the words I've studied least recently, so each new deck shows me different cards. Korean is on the front and English on the back, and I mark each card "Got it" or "Missed it". Every answer is saved, and at the end I can study just the words I missed.
-- A dashboard on the home page: how many words I have, my overall % correct, my reviews this week, and a chart of reviews per day for the last two weeks.
+- Study mode: study one lesson, my starred words, or a random mix of up to 50 cards from all lessons, in a shuffled order. The mix starts with the words I've studied least recently, so each new deck shows me different cards. Korean is on the front and English on the back, and I mark each card "Got it" or "Missed it". Every answer is saved, and at the end I can study just the words I missed. On a laptop, Space flips the card, ← is "Missed it" and → is "Got it".
+- A dashboard on the home page: how many words I have, my overall % correct, my reviews this week and all time, and a chart of reviews per day for the last two weeks, which can also be shown as a table.
 - Lesson mastery on the home page: each lesson shows how many words are known, fading, missed and new, its % mastered, its weakest words (missed the most), and its fading words (not tested in a while). A word stays Known for longer the more times in a row I get it right (1 → 2 days, 2 → 4, 3 → 7, 4 or more → 14).
-- A study streak on the home page: how many days in a row I've studied, in my own time zone. See [PLAN.md](PLAN.md) for the full plan.
+- A study streak on the home page: how many days in a row I've studied, in my own time zone.
+
+See [PLAN.md](PLAN.md) for the full plan.
 
 ## Tools
 
@@ -25,6 +27,7 @@ A Korean vocab study app built from my textbook's word list. I can save words by
 | [Claude Code](https://claude.com/claude-code) | AI coding agent that builds each feature |
 | [Next.js](https://nextjs.org) | The web app |
 | [Recharts](https://recharts.org) | The reviews-per-day chart on the dashboard |
+| [Papa Parse](https://www.papaparse.com) | Reading CSV files for the import |
 | [Supabase](https://supabase.com) | Database (Postgres) and sign-up / log-in |
 | [Vercel](https://vercel.com) | Hosting; redeploys on every merge to `main` |
 | GitHub | Code, Issues and pull requests |
@@ -53,9 +56,9 @@ You'll need [Node.js](https://nodejs.org) and a free Supabase project.
 npm test
 ```
 
-Runs the automated tests in `lib/` (for example, 10 reviews with 7 "Got it" shows 70%).
+Runs the automated tests in `lib/` with Node's built-in test runner (for example, 10 reviews with 7 "Got it" shows 70%).
 
 ## Project docs
 
-- [PLAN.md](PLAN.md): the plan, written before building
+- [PLAN.md](PLAN.md): the plan, written before building, with a Plan vs. Reality table at the end
 - [prompts/](prompts): the prompts I gave the agent for each feature
