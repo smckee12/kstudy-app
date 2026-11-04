@@ -15,6 +15,7 @@ import {
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 import { percentCorrect, reviewsPerDay, type Day } from "@/lib/dashboard";
 import type { DashboardData } from "@/lib/data";
+import { studyStreak, type Streak } from "@/lib/streak";
 
 const CHART_DAYS = 14;
 const NAVY = "#1f3a5f";
@@ -32,13 +33,12 @@ export function Dashboard({ data }: { data: DashboardData }) {
   const isBrowser = useIsBrowser();
   const accuracy = percentCorrect(data.correctCount, data.reviewCount);
 
+  const now = new Date();
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const days = isBrowser
-    ? reviewsPerDay(data.recent, {
-        days: CHART_DAYS,
-        now: new Date(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      })
+    ? reviewsPerDay(data.recent, { days: CHART_DAYS, now, timeZone })
     : null;
+  const streak = isBrowser ? studyStreak(data.answerMinutes, { now, timeZone }) : null;
   // "This week" = the last 7 days including today, the same days as the
   // right half of the chart.
   const thisWeek = days?.slice(-7).reduce((sum, d) => sum + d.reviews, 0);
@@ -50,6 +50,12 @@ export function Dashboard({ data }: { data: DashboardData }) {
       </h2>
 
       <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatTile
+          label="Study streak"
+          value={streakValue(streak)}
+          note={streakNote(streak)}
+          className="col-span-2 sm:col-span-4"
+        />
         <StatTile label="Words" value={data.wordCount.toLocaleString()} />
         <StatTile
           label="Correct overall"
@@ -139,14 +145,37 @@ export function Dashboard({ data }: { data: DashboardData }) {
   );
 }
 
-function StatTile({ label, value, note }: { label: string; value: string; note?: string }) {
+function StatTile({
+  label,
+  value,
+  note,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  note?: string;
+  className?: string;
+}) {
   return (
-    <div className="rounded-xl bg-surface p-4">
+    <div className={`rounded-xl bg-surface p-4 ${className}`}>
       <dt className="text-sm text-gray-600">{label}</dt>
       <dd className="mt-1 text-3xl font-semibold text-navy">{value}</dd>
       {note && <dd className="mt-0.5 text-xs text-gray-500">{note}</dd>}
     </div>
   );
+}
+
+// null until the browser takes over: only it knows what day it is for me.
+function streakValue(streak: Streak | null) {
+  if (!streak) return "…";
+  const days = `${streak.days} ${streak.days === 1 ? "day" : "days"}`;
+  return streak.days > 0 ? `🔥 ${days}` : days;
+}
+
+function streakNote(streak: Streak | null) {
+  if (!streak) return undefined;
+  if (streak.days === 0) return "Study today to start a streak";
+  return streak.studiedToday ? "You studied today" : "Study today to keep it going";
 }
 
 // What shows when I hover (or tap) a day's bar.
