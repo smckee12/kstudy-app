@@ -147,4 +147,15 @@ erDiagram
 
 | Planned feature | Shipped / Changed / Cut | Status (Done/Backlogged) | Learning | What changed and why (one line) |
 | -------- | -------- | -------- | -------- | -------- |
-| | | | | |
+| 1. Sign up and log in | Shipped | Done | *(Sean to write)* | Built as planned. Added a check for signing up with an email that already exists, because Supabase hides that case when "Confirm email" is on. |
+| 2. Data model | Changed | Done | *(Sean to write)* | `user_id` is a `uuid` instead of text, because that's what Supabase account ids are; deleting a lesson that still has cards is blocked to prevent accidents. |
+| 3. Create / read / update / delete | Changed | Done | *(Sean to write)* | The "Are you sure?" prompt appears on the page instead of as a browser pop-up, so it matches the app's look. |
+| 4. Validation | Shipped | Done | *(Sean to write)* | Built as planned, with a friendly message for each field. |
+| 5. CSV import | Changed | Done | *(Sean to write)* | 260 words instead of 257; added a check that a row's topic matches its lesson after it caught 3 rows with wrong lesson numbers in my spreadsheet. |
+| 6. Stars | Shipped | Done | *(Sean to write)* | Built as planned. |
+| 7. Find things | Changed | Done | *(Sean to write)* | Added a "Starred only" checkbox to My words so it combines with search and lesson; fixed a bug where the search box lost letters while results loaded. |
+| 8. Study mode | Changed | Done | *(Sean to write)* | Added a Starred deck, "study just the missed words" and keyboard shortcuts, because they make drilling problem words faster. |
+| 9. Dashboard | Changed | Done | *(Sean to write)* | On the home page instead of its own page, because a fifth header link wouldn't fit on a phone; one chart color because green and red failed a colorblindness check; "this week" means the last 7 days. |
+| 10. Lesson mastery | Shipped | Done | *(Sean to write)* | On the home page lesson tiles; PLAN.md didn't define "weakest", so it's the most-missed words, with Fading as a separate list below. |
+| 11. Study streak | Shipped | Done | *(Sean to write)* | On the home page with the dashboard; not having studied yet today doesn't break the streak, because the day isn't over. |
+| *(Not planned)* Random mix of up to 50 cards | Shipped | Done | *(Sean to write)* | I wanted to study across all lessons; it picks the least recently studied words first, so new decks don't repeat the same cards. |
