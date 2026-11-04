@@ -38,6 +38,7 @@ After merging: `gh pr merge N --merge`, `git switch main && git pull --ff-only`,
 
 - `lib/data.ts`: all reads. `getLessons()`, `getCards({ search, lessonId, starredOnly, sort })`, `getCard(id)`. The My words filters live in the URL and are parsed by `lib/card-filters.ts`. Cards come back as `CardWithLesson` (the card, its `lesson`, and `starred`). Add new filters/sorting here.
 - `lib/card-rules.ts`: the card rules shared by the forms and the CSV import (`validateCard`, `toCardRow`, the friendly messages like "Please add the Korean word.").
+- `lib/dashboard.ts`: the dashboard math (`percentCorrect`, `reviewsPerDay` in my time zone). Tested in `lib/dashboard.test.ts`; run `npm test`. `getDashboardData()` in `lib/data.ts` loads the counts.
 - `lib/csv-import.ts`: reads a vocab CSV with Papa Parse. It runs in the browser for the preview and again in the Server Action before saving.
 - `app/actions/`: Server Actions (`auth.ts`, `cards.ts`, `import.ts`, `stars.ts`, `reviews.ts`). They return `{ error }` or field errors instead of throwing.
 - Pages: `/cards` (My words), `/cards/new`, `/cards/[id]`, `/cards/[id]/edit`, `/cards/import`, `/starred`, `/study` (pick a deck), `/study/[deck]` (a lesson id, `starred`, or `random?count=N` with 1–50 cards, checked in `lib/random-set.ts`; the flip-card session is `app/study/[deck]/study-session.tsx`). A missing or someone else's card shows "Card not found" (`app/cards/[id]/card-not-found.tsx`).

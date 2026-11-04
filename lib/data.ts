@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import type { CardFilters } from "@/lib/card-filters";
+import type { ReviewTime } from "@/lib/dashboard";
 import type { Card, Lesson } from "@/lib/types";
 
 export type LessonWithCount = Lesson & { card_count: number };
@@ -99,4 +100,55 @@ export async function getCard(id: string): Promise<CardWithLesson | null> {
 
   if (error) throw new Error(`Couldn't load card: ${error.message}`);
   return data ? withStarred(data as CardRow) : null;
+}
+
+export type DashboardData = {
+  wordCount: number;
+  reviewCount: number;
+  correctCount: number;
+  // My answers from roughly the last 15 days (just the time and whether it
+  // was right), for "this week" and the chart. The browser sorts them into
+  // days in my own time zone.
+  recent: ReviewTime[];
+};
+
+// Everything the dashboard needs. Nothing is stored for it: it's all
+// counted from cards and reviews each time (PLAN.md section 3).
+export async function getDashboardData(): Promise<DashboardData> {
+  const user = await getCurrentUser();
+  if (!user) return { wordCount: 0, reviewCount: 0, correctCount: 0, recent: [] };
+
+  const supabase = await createClient();
+  // 15 days, not 14: one spare day covers the gap between UTC and my time zone.
+  const since = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
+
+  // `head: true` asks the database for just the count, not the rows.
+  const [words, reviews, correct, recent] = await Promise.all([
+    supabase.from("cards").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+    supabase.from("reviews").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+    supabase
+      .from("reviews")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("correct", true),
+    supabase
+      .from("reviews")
+      .select("reviewed_at, correct")
+      .eq("user_id", user.id)
+      .gte("reviewed_at", since)
+      .order("reviewed_at")
+      // Supabase returns at most 1,000 rows per request: that is over 70
+      // answers a day for two weeks, plenty for one student.
+      .limit(1000),
+  ]);
+
+  const error = words.error ?? reviews.error ?? correct.error ?? recent.error;
+  if (error) throw new Error(`Couldn't load the dashboard: ${error.message}`);
+
+  return {
+    wordCount: words.count ?? 0,
+    reviewCount: reviews.count ?? 0,
+    correctCount: correct.count ?? 0,
+    recent: recent.data ?? [],
+  };
 }

@@ -14,7 +14,8 @@ A Korean vocab study app built from my textbook's word list. I can save words by
 - Star words I keep forgetting (☆ → ★) and see them all on the Starred page.
 - Search my words in Korean or English, filter by lesson or starred, and sort by newest, 가나다 order, or lesson. The search is saved in the page's address, so it survives a reload.
 - Study mode: study one lesson, my starred words, or a random mix of up to 50 cards from all lessons, in a shuffled order. Korean is on the front and English on the back, and I mark each card "Got it" or "Missed it". Every answer is saved, and at the end I can study just the words I missed.
-- *Coming next:* a dashboard, lesson mastery and a study streak. See [PLAN.md](PLAN.md) for the full plan.
+- A dashboard on the home page: how many words I have, my overall % correct, my reviews this week, and a chart of reviews per day for the last two weeks.
+- *Coming next:* lesson mastery and a study streak. See [PLAN.md](PLAN.md) for the full plan.
 
 ## Tools
 
@@ -22,6 +23,7 @@ A Korean vocab study app built from my textbook's word list. I can save words by
 | -------- | -------- |
 | [Claude Code](https://claude.com/claude-code) | AI coding agent that builds each feature |
 | [Next.js](https://nextjs.org) | The web app |
+| [Recharts](https://recharts.org) | The reviews-per-day chart on the dashboard |
 | [Supabase](https://supabase.com) | Database (Postgres) and sign-up / log-in |
 | [Vercel](https://vercel.com) | Hosting; redeploys on every merge to `main` |
 | GitHub | Code, Issues and pull requests |
@@ -43,6 +45,14 @@ You'll need [Node.js](https://nodejs.org) and a free Supabase project.
    npm run dev
    ```
    Then open http://localhost:3000.
+
+## Tests
+
+```bash
+npm test
+```
+
+Runs the automated tests in `lib/` (for example, 10 reviews with 7 "Got it" shows 70%).
 
 ## Project docs
 
