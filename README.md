@@ -15,7 +15,7 @@ A Korean vocab study app built from my textbook's word list. I can save words by
 - Search my words in Korean or English, filter by lesson or starred, and sort by newest, 가나다 order, or lesson. The search is saved in the page's address, so it survives a reload.
 - Study mode: study one lesson, my starred words, or a random mix of up to 50 cards from all lessons, in a shuffled order. Korean is on the front and English on the back, and I mark each card "Got it" or "Missed it". Every answer is saved, and at the end I can study just the words I missed.
 - A dashboard on the home page: how many words I have, my overall % correct, my reviews this week, and a chart of reviews per day for the last two weeks.
-- Lesson mastery on the home page: each lesson shows how many words are known, fading, missed and new, its % mastered, and its weakest words. A word stays Known for longer the more times in a row I get it right (1 → 2 days, 2 → 4, 3 → 7, 4 or more → 14).
+- Lesson mastery on the home page: each lesson shows how many words are known, fading, missed and new, its % mastered, its weakest words (missed the most), and its fading words (not tested in a while). A word stays Known for longer the more times in a row I get it right (1 → 2 days, 2 → 4, 3 → 7, 4 or more → 14).
 - *Coming next:* a study streak. See [PLAN.md](PLAN.md) for the full plan.
 
 ## Tools

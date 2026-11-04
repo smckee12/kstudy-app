@@ -72,7 +72,7 @@ test("a lesson with no words is 0% mastered (and doesn't crash)", () => {
   assert.equal(lessonMastery([], NOW).percent, 0);
 });
 
-test("weakest words: most-missed first, then most overdue, never Known or New", () => {
+test("weakest is the most-missed words; fading is a separate tier, most overdue first", () => {
   const mastery = lessonMastery(
     [
       word(1, [daysAgo(1, true)]), // Known
@@ -84,13 +84,24 @@ test("weakest words: most-missed first, then most overdue, never Known or New", 
     ],
     NOW,
   );
-  assert.deepEqual(mastery.weakest.map((w) => w.id), [6, 5, 4, 3]);
+  assert.deepEqual(mastery.weakest.map((w) => w.id), [6, 5]);
   assert.equal(mastery.weakest[0].timesMissed, 2);
+  assert.deepEqual(mastery.fadingWords.map((w) => w.id), [4, 3]);
 });
 
-test("only the 5 weakest words are listed", () => {
-  const words = Array.from({ length: 8 }, (_, i) => word(i, [daysAgo(1, false)]));
+test("a word missed in the past leaves Weakest once I get it right", () => {
+  const mastery = lessonMastery([word(1, [daysAgo(3, false), daysAgo(1, true)])], NOW);
+  assert.deepEqual(mastery.weakest, []);
+  assert.equal(mastery.known, 1);
+});
+
+test("many missed words don't push the fading words off their list", () => {
+  const words = [
+    ...Array.from({ length: 8 }, (_, i) => word(i, [daysAgo(1, false)])),
+    word(100, [daysAgo(3, true)]),
+  ];
   const mastery = lessonMastery(words, NOW);
-  assert.equal(mastery.weakest.length, 5);
+  assert.equal(mastery.weakest.length, 5); // only the top 5 are listed
   assert.equal(mastery.missed, 8);
+  assert.deepEqual(mastery.fadingWords.map((w) => w.id), [100]);
 });

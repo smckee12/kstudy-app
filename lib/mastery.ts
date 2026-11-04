@@ -12,11 +12,10 @@ export type Word = {
   answers: Answer[]; // oldest first
 };
 
-export type WeakWord = {
+export type ListedWord = {
   id: number;
   korean: string;
   english: string;
-  status: "missed" | "fading";
   timesMissed: number;
 };
 
@@ -27,7 +26,8 @@ export type LessonMastery = {
   missed: number;
   new: number;
   percent: number; // Known words ÷ all words in the lesson
-  weakest: WeakWord[];
+  weakest: ListedWord[]; // my last answer was "Missed it", most often missed first
+  fadingWords: ListedWord[]; // a tier below: maybe still known, just not tested lately
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -70,16 +70,26 @@ export function wordProgress(answers: Answer[], now: Date) {
   };
 }
 
-// The counts for one lesson, plus its weakest words: Missed words first (the
-// most often missed at the top), then Fading words (the most overdue at the
-// top). New words aren't "weak": I just haven't tried them yet.
-export function lessonMastery(words: Word[], now: Date, weakestCount = 5): LessonMastery {
+// The counts for one lesson, plus two short lists of words to review:
+//   - Weakest: words whose last answer was "Missed it", the most often missed
+//     at the top. Getting one right takes it off the list.
+//   - Fading, a tier below: I may still know these, I just haven't been tested
+//     in a while. The most overdue are at the top.
+// New words aren't on either list: I just haven't tried them yet.
+export function lessonMastery(words: Word[], now: Date, listSize = 5): LessonMastery {
   const progress = words.map((word) => ({ word, ...wordProgress(word.answers, now) }));
   const withStatus = (status: Status) => progress.filter((p) => p.status === status);
 
   const missed = withStatus("missed").sort((a, b) => b.timesMissed - a.timesMissed);
   const fading = withStatus("fading").sort((a, b) => b.overdueMs - a.overdueMs);
   const known = withStatus("known").length;
+  const listed = (list: typeof progress): ListedWord[] =>
+    list.slice(0, listSize).map((p) => ({
+      id: p.word.id,
+      korean: p.word.korean,
+      english: p.word.english,
+      timesMissed: p.timesMissed,
+    }));
 
   return {
     total: words.length,
@@ -88,12 +98,7 @@ export function lessonMastery(words: Word[], now: Date, weakestCount = 5): Lesso
     missed: missed.length,
     new: withStatus("new").length,
     percent: words.length === 0 ? 0 : Math.round((known / words.length) * 100),
-    weakest: [...missed, ...fading].slice(0, weakestCount).map((p) => ({
-      id: p.word.id,
-      korean: p.word.korean,
-      english: p.word.english,
-      status: p.status as WeakWord["status"],
-      timesMissed: p.timesMissed,
-    })),
+    weakest: listed(missed),
+    fadingWords: listed(fading),
   };
 }
