@@ -19,3 +19,12 @@ Agent: Claude Code · Branch `docs/final-check`
 ## Left as it is
 
 - The Learning column in the Plan vs. Reality table still says "*(Sean to write)*", because my learning notes are in a separate document.
+
+## Prompt 2
+
+> Can you add in those instructions for randomization and "weakest and fading"
+
+## What the agent did
+
+- Added the rules to the user stories in `PLAN.md` section 2: the random mix and how it picks cards in feature 8, and the Weakest and Fading lists in feature 10. Each is marked "*Added during the build*", so it's clear they weren't in the original plan.
+- Checked the wording against `lib/random-set.ts` and `lib/mastery.ts`.

@@ -60,5 +60,5 @@ Runs the automated tests in `lib/` with Node's built-in test runner (for example
 
 ## Project docs
 
-- [PLAN.md](PLAN.md): the plan, written before building, with a Plan vs. Reality table at the end
+- [PLAN.md](PLAN.md): the plan, written before building, with rules added during the build marked as such and a Plan vs. Reality table at the end
 - [prompts/](prompts): the prompts I gave the agent for each feature
